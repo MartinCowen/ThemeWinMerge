@@ -33,6 +33,7 @@ namespace ThemeWinMerge
             this.btnOpen = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.gbDisplayOptions = new System.Windows.Forms.GroupBox();
+            this.chkHook = new System.Windows.Forms.CheckBox();
             this.chkAllDisplayOptions = new System.Windows.Forms.CheckBox();
             this.chkText = new System.Windows.Forms.CheckBox();
             this.chkDeleted = new System.Windows.Forms.CheckBox();
@@ -47,6 +48,9 @@ namespace ThemeWinMerge
             this.btnSave = new System.Windows.Forms.Button();
             this.chkSelectAllShown = new System.Windows.Forms.CheckBox();
             this.gbColourChange = new System.Windows.Forms.GroupBox();
+            this.btnTempDown = new System.Windows.Forms.Button();
+            this.btnTempUp = new System.Windows.Forms.Button();
+            this.label6 = new System.Windows.Forms.Label();
             this.btnBlackDown = new System.Windows.Forms.Button();
             this.btnBlackUp = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
@@ -60,9 +64,6 @@ namespace ThemeWinMerge
             this.btnRedUp = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.lblCount = new System.Windows.Forms.Label();
-            this.btnTempDown = new System.Windows.Forms.Button();
-            this.btnTempUp = new System.Windows.Forms.Button();
-            this.label6 = new System.Windows.Forms.Label();
             this.gbDisplayOptions.SuspendLayout();
             this.gbColourChange.SuspendLayout();
             this.SuspendLayout();
@@ -87,6 +88,7 @@ namespace ThemeWinMerge
             // 
             // gbDisplayOptions
             // 
+            this.gbDisplayOptions.Controls.Add(this.chkHook);
             this.gbDisplayOptions.Controls.Add(this.chkAllDisplayOptions);
             this.gbDisplayOptions.Controls.Add(this.chkText);
             this.gbDisplayOptions.Controls.Add(this.chkDeleted);
@@ -97,10 +99,21 @@ namespace ThemeWinMerge
             this.gbDisplayOptions.Controls.Add(this.chkLine);
             this.gbDisplayOptions.Location = new System.Drawing.Point(479, 54);
             this.gbDisplayOptions.Name = "gbDisplayOptions";
-            this.gbDisplayOptions.Size = new System.Drawing.Size(312, 116);
+            this.gbDisplayOptions.Size = new System.Drawing.Size(312, 137);
             this.gbDisplayOptions.TabIndex = 3;
             this.gbDisplayOptions.TabStop = false;
             this.gbDisplayOptions.Text = "Display Options";
+            // 
+            // chkHook
+            // 
+            this.chkHook.AutoSize = true;
+            this.chkHook.Location = new System.Drawing.Point(7, 114);
+            this.chkHook.Name = "chkHook";
+            this.chkHook.Size = new System.Drawing.Size(89, 17);
+            this.chkHook.TabIndex = 8;
+            this.chkHook.Text = "System Hook";
+            this.chkHook.UseVisualStyleBackColor = true;
+            this.chkHook.CheckedChanged += new System.EventHandler(this.chkHook_CheckedChanged);
             // 
             // chkAllDisplayOptions
             // 
@@ -252,12 +265,44 @@ namespace ThemeWinMerge
             this.gbColourChange.Controls.Add(this.btnRedDown);
             this.gbColourChange.Controls.Add(this.btnRedUp);
             this.gbColourChange.Controls.Add(this.label2);
-            this.gbColourChange.Location = new System.Drawing.Point(479, 189);
+            this.gbColourChange.Location = new System.Drawing.Point(479, 212);
             this.gbColourChange.Name = "gbColourChange";
             this.gbColourChange.Size = new System.Drawing.Size(312, 243);
             this.gbColourChange.TabIndex = 8;
             this.gbColourChange.TabStop = false;
             this.gbColourChange.Text = "Colour Change All Selected";
+            // 
+            // btnTempDown
+            // 
+            this.btnTempDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTempDown.Location = new System.Drawing.Point(187, 126);
+            this.btnTempDown.Name = "btnTempDown";
+            this.btnTempDown.Size = new System.Drawing.Size(31, 28);
+            this.btnTempDown.TabIndex = 14;
+            this.btnTempDown.Text = "↓";
+            this.btnTempDown.UseVisualStyleBackColor = true;
+            this.btnTempDown.Click += new System.EventHandler(this.btnTempDown_Click);
+            // 
+            // btnTempUp
+            // 
+            this.btnTempUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnTempUp.Location = new System.Drawing.Point(187, 99);
+            this.btnTempUp.Name = "btnTempUp";
+            this.btnTempUp.Size = new System.Drawing.Size(31, 28);
+            this.btnTempUp.TabIndex = 13;
+            this.btnTempUp.Text = "↑";
+            this.btnTempUp.UseVisualStyleBackColor = true;
+            this.btnTempUp.Click += new System.EventHandler(this.btnTempUp_Click);
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
+            this.label6.Location = new System.Drawing.Point(154, 114);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(34, 13);
+            this.label6.TabIndex = 12;
+            this.label6.Text = "Temp";
             // 
             // btnBlackDown
             // 
@@ -396,38 +441,6 @@ namespace ThemeWinMerge
             this.lblCount.TabIndex = 9;
             this.lblCount.Text = "Count: 0";
             // 
-            // btnTempDown
-            // 
-            this.btnTempDown.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnTempDown.Location = new System.Drawing.Point(187, 126);
-            this.btnTempDown.Name = "btnTempDown";
-            this.btnTempDown.Size = new System.Drawing.Size(31, 28);
-            this.btnTempDown.TabIndex = 14;
-            this.btnTempDown.Text = "↓";
-            this.btnTempDown.UseVisualStyleBackColor = true;
-            this.btnTempDown.Click += new System.EventHandler(this.btnTempDown_Click);
-            // 
-            // btnTempUp
-            // 
-            this.btnTempUp.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnTempUp.Location = new System.Drawing.Point(187, 99);
-            this.btnTempUp.Name = "btnTempUp";
-            this.btnTempUp.Size = new System.Drawing.Size(31, 28);
-            this.btnTempUp.TabIndex = 13;
-            this.btnTempUp.Text = "↑";
-            this.btnTempUp.UseVisualStyleBackColor = true;
-            this.btnTempUp.Click += new System.EventHandler(this.btnTempUp_Click);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            this.label6.Location = new System.Drawing.Point(154, 114);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(34, 13);
-            this.label6.TabIndex = 12;
-            this.label6.Text = "Temp";
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -493,6 +506,7 @@ namespace ThemeWinMerge
         private System.Windows.Forms.Button btnTempDown;
         private System.Windows.Forms.Button btnTempUp;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.CheckBox chkHook;
     }
 }
 

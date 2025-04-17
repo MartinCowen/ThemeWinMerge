@@ -32,6 +32,7 @@ namespace ThemeWinMerge
             public bool iscolour;
             public Color originalcolour;
             public Color newcolour;
+            public string key;
         }
         private List<items> listofitems = new List<items> { };
         enum category_e
@@ -40,6 +41,7 @@ namespace ThemeWinMerge
             syntax,
             markers,
             dir,
+            syshook,
         }
 
         enum type_e
@@ -114,6 +116,24 @@ namespace ThemeWinMerge
             mappingList.Add(new mapping { category = category_e.dir, type = type_e.background, guiname = "Dir Item Filtered", itemname = "DirItemFilteredColor" });
             mappingList.Add(new mapping { category = category_e.dir, type = type_e.background, guiname = "Dir Margin", itemname = "DirMarginColor" });
 
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Active Caption", itemname = "COLOR_ACTIVECAPTION" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Inactive Caption", itemname = "COLOR_INACTIVECAPTION" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.background, guiname = "Window", itemname = "COLOR_WINDOW" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Window Text", itemname = "COLOR_WINDOWTEXT" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Caption Text", itemname = "COLOR_CAPTIONTEXT" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.background, guiname = "App Workspace", itemname = "COLOR_APPWORKSPACE" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.background, guiname = "Highlight", itemname = "COLOR_HIGHLIGHT" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Highlight Text", itemname = "COLOR_HIGHLIGHTTEXT" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.background, guiname = "3D Face", itemname = "COLOR_3DFACE" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.background, guiname = "3D Shadow", itemname = "COLOR_3DSHADOW" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Gray Text", itemname = "COLOR_GRAYTEXT" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Button Text", itemname = "COLOR_BTNTEXT" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Inactive Caption Text", itemname = "COLOR_INACTIVECAPTIONTEXT" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.background, guiname = "3D Highlight", itemname = "COLOR_3DHIGHLIGHT" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.background, guiname = "3D Dark Shadow", itemname = "COLOR_3DDKSHADOW" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Gradient Active Caption", itemname = "COLOR_GRADIENTACTIVECAPTION" });
+            mappingList.Add(new mapping { category = category_e.syshook, type = type_e.text, guiname = "Gradient Inactive Caption", itemname = "COLOR_GRADIENTINACTIVECAPTION" });
+
         }
 
         /// <summary>
@@ -175,60 +195,91 @@ namespace ThemeWinMerge
         {
             string[] lines = filetext.Split('\r');
             listofitems.Clear();
+            bool syscolorsused = false;
+            bool multiitemline = false;
+
             foreach (string s in lines)
             {
                 items item = new items();
                 item.basename = s.Replace("\n", "");
                 item.vartype = vartype_e.varnull;
-                if (s.Contains("="))
+
+                //SysColorHooksColors need special handling since the keys are given in a comment and the line has multiple values
+                if (s.Contains("SysColorHookEnabled=1"))
                 {
+                    syscolorsused = true;
+                }
+                if (s.Contains("=") || syscolorsused)
+                {
+                    if (syscolorsused)
+                    {
+                        if (s.Contains("COLOR_"))
+                        {
+                            item.basename = "SysColorHookColors";
+                            item.key = s.Split('\t')[0].Replace("\n", "").Replace(";", "");
+                            item.itemname = s.Split('\t')[2];
+                        }
+                    }
                     string[] q = s.Split('=');
-                    if (q[0].Contains("Color"))
+                    if (q[0].Contains("Color") && q[0].StartsWith("\n;") == false)
                     {
                         string[] p = s.Split('/');
                         item.basename = p[0].Replace("\n", "");
                         item.itemname = p[1].Split('=')[0];
                         item.value = s.Split('=')[1];
 
-                        int result;
-                        if (item.value.Contains("0x"))
+                        if (item.itemname.Contains("SysColorHookColors"))
                         {
-                            item.vartype = vartype_e.varhex;
-                            if (item.itemname.Contains("Color"))
+                            string[] hks = s.Split('=')[1].Split(',');
+                            foreach (string hk in hks)
                             {
-                                item.iscolour = true;
-                                item.originalcolour = NumberToColour(item.value, item.vartype);
-                                item.newcolour = item.originalcolour;
+                                foreach (items i in listofitems)
+                                {
+                                    if (hk.Split(':')[0] == i.key)
+                                    {
+                                        i.value = hk.Split(':')[1].Remove(2,2); //these values had a leading pair of zeros
+                                        i.iscolour = true;
+                                        i.vartype = vartype_e.varhex;
+                                        i.originalcolour = NumberToColour(i.value, i.vartype);
+                                        i.newcolour = i.originalcolour;
+                                        break;
+                                    }
+                                }
                             }
+                            item.basename = s.Replace("\n", "");
+                            listofitems.Add(item);
+                            multiitemline = true;                           
                         }
-                        else if (int.TryParse(item.value, out result))
+                        if (!multiitemline)
                         {
-                            item.vartype = vartype_e.varint;
-                        }
-                        else
-                        {
-                            item.vartype = vartype_e.varstring;
+                            int result;
+                            if (item.value.Contains("0x"))
+                            {
+                                item.vartype = vartype_e.varhex;
+                                if (item.itemname.Contains("Color"))
+                                {
+                                    item.iscolour = true;
+                                    item.originalcolour = NumberToColour(item.value, item.vartype);
+                                    item.newcolour = item.originalcolour;
+                                }
+                            }
+                            else if (int.TryParse(item.value, out result))
+                            {
+                                item.vartype = vartype_e.varint;
+                            }
+                            else
+                            {
+                                item.vartype = vartype_e.varstring;
+                            }
                         }
                     }
                 }
-                if (item.basename != String.Empty)
+                if (item.basename != String.Empty && !multiitemline)
                 {
                     listofitems.Add(item);
                 }
             }
-        }
-
-        private string CreateFile(string schemename)
-        {
-            const string nl = "\r\n";
-            string s = "; " + schemename + nl + "[WinMerge]" + nl;
-            foreach (items item in listofitems)
-            {
-                s += item.basename + "/" + item.itemname + "=" + item.value + nl;
-            }
-
-            return s;
-        }
+        }        
 
         /// <summary>
         /// WinMerge ini files store colour as decimal or hex 0xBBGGRR, not RGB order
@@ -355,7 +406,8 @@ namespace ThemeWinMerge
             if (((chkLine.Checked && m.category == category_e.line) ||
             (chkSyntax.Checked && m.category == category_e.syntax) ||
             (chkMarkers.Checked && m.category == category_e.markers) ||
-            (chkDir.Checked && m.category == category_e.dir)) &&
+            (chkDir.Checked && m.category == category_e.dir) ||
+            (chkHook.Checked && m.category == category_e.syshook)) &&
             ((chkBackground.Checked && m.type == type_e.background) ||
             (chkDeleted.Checked && m.type == type_e.deleted) ||
             (chkText.Checked && m.type == type_e.text) ||
@@ -424,6 +476,7 @@ namespace ThemeWinMerge
                 chkBackground.Checked = true;
                 chkDeleted.Checked = true;
                 chkText.Checked = true;
+                chkHook.Checked = true;
             }
             else if (chkAllDisplayOptions.CheckState == CheckState.Unchecked)
             {
@@ -435,6 +488,7 @@ namespace ThemeWinMerge
                 chkBackground.Checked = false;
                 chkDeleted.Checked = false;
                 chkText.Checked = false;
+                chkHook.Checked = false;
             }
             suspendLayout = false;
             PopulatePanel();
@@ -456,7 +510,7 @@ namespace ThemeWinMerge
 
             if (chkLine.CheckState == chkSyntax.CheckState && chkSyntax.CheckState == chkMarkers.CheckState && chkMarkers.CheckState == chkDir.CheckState
                 && chkDir.CheckState == chkBackground.CheckState && chkBackground.CheckState == chkDeleted.CheckState && chkDeleted.CheckState == chkText.CheckState
-                )
+                && chkText.CheckState == chkHook.CheckState)
             {
                 if (chkLine.CheckState == CheckState.Checked)
                 {
@@ -509,6 +563,12 @@ namespace ThemeWinMerge
             PopulatePanel();
         }
 
+        private void chkHook_CheckedChanged(object sender, EventArgs e)
+        {
+            SetAllDisplayOptionsState();
+            PopulatePanel();
+        }
+
         private void Form1_Click(object sender, EventArgs e)
         {
         }
@@ -527,19 +587,33 @@ namespace ThemeWinMerge
         private string CreateFileContents()
         {
             string s = String.Empty;
+            string hks = "Settings/SysColorHookColors=";
             foreach (items i in listofitems)
             {
                 if (i.vartype != vartype_e.varnull)
                 {
-                    s += ItemFullName(i) + '=';
-                    if (i.iscolour)
-                    {
-                        s += ColourToHex(i.newcolour);
+                    if (i.basename == "SysColorHookColors")
+                    {   
+                        s += ";" + i.key + "\t" + ColourToHex(i.newcolour) + "\t" + i.itemname;
+                        hks += i.key + ":0x00" + ColourToHex(i.newcolour).TrimStart('0').TrimStart('x') + ",";                        
                     }
                     else
                     {
-                        s += i.value;
+
+                        s += ItemFullName(i) + '=';
+                        if (i.iscolour)
+                        {
+                            s += ColourToHex(i.newcolour);
+                        }
+                        else
+                        {
+                            s += i.value;
+                        }
                     }
+                }
+                else if (i.itemname == "SysColorHookColors")
+                {
+                    s += hks.TrimEnd(',');
                 }
                 else
                 {

@@ -16,6 +16,7 @@ This utility provides a way to design colour schemes for WinMerge. WinMerge's Op
  - "Line" colours have Background, Deleted and Text colours. This means the background to a line difference, the background to a deleted line, and the text font colour used for line differences.
  - "Syntax" and "Markers" don't have other options.
  - Directory has Background and Text options.
+ - System Hook has Background and Text options.
 
 ## List of Items
 Each colour item found in the ini file is filtered according to the Display Options and shown in the list.
@@ -35,6 +36,21 @@ Every item with the checkbox ticked will be affected by these controls.
  - Red, Green, Blue arrow buttons nudge the primary component up or down by 2 steps until it hits 0 or 255.
  - Black arrow buttons nudge all three primaries by 2 steps until they hit 0 or 255 each.
  - Temp arrows adjust the colour temperature - up is warmer by adding 2 steps to red and removing 2 steps from blue, down is the opposite.
+
+## System Hook Colors
+Not all themes support System Hook Colors, the flag is `Settings/SysColorHookEnabled`  
+WinMerge seems to only pick up some of these colors, others are set by your Windows colour scheme.  
+The colours are set in a single line entry containing all the colours with a key system which is commented at the end of the file. Note that this program picks up the colours from the entry not the comments and rewrites the comments according to the colours in the entry. This results in a few discrepancies when opening and saving the default files without making any changes, which is because the comments were wrong.  
+Do not remove the comment lines in the theme files, though, because they are used for the mapping.  
+
+ - Active Caption and Inactive Caption are used for diff pane headings.
+ - Window background is used for example in the find result dialog when not found.
+ - Window Text is used for app title bar text
+ - 3D Highlight is used for the titlebar background and app title background
+ - 3D Face is used for pane borders and titlebar, and in other places such in the Not Found dialog box surrounding the OK button and when mouseover the top level menu items (File etc)
+  - Button Text is used for top level menu item text
+  - Gradient Active and Inactive Captions are used for location and diff pane background of captions
+  - Others appear to not be used/implemented but are listed for completeness. If you find the use of these, please either update this document or raise a github issue.
 
 ## Installation
 No installer is provided because the program consists of a single [executable](ThemeWinMerge/bin/release/ThemeWinMerge.exe) which has no dependencies other than what is standard on a Windows 10 installation.
